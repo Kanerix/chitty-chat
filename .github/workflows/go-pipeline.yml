@@ -1,0 +1,18 @@
+name: CI/CD for entire project
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'client'
+      - 'server'
+      - 'grpc'
+      - 'Dockerfile'
+      - 'go.mod'
+      - 'go.sum'
+    branches:
+      - '**'
+    
+jobs:
+  pipeline:
+    uses: ./.github/workflows/prepare-pipeline.yml

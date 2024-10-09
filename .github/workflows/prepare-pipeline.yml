@@ -1,0 +1,66 @@
+name: Prepare pipeline and set variables
+
+on:
+  workflow_call:
+    outputs:
+      dotnet_version:
+        description: The version of .NET to use
+        value: ${{ jobs.prepare-pipeline-vars.outputs.dotnet_version }}
+
+      deploy_env:
+        description: Deployment environment (prod, stag or dev)
+        value: ${{ jobs.prepare-pipeline-vars.outputs.deploy_env }}
+
+      solution_version:
+        description: The version of the solution
+        value: ${{ jobs.prepare-pipeline-vars.outputs.solution_version }}
+
+jobs:
+  prepare-pipeline-vars:
+    runs-on: ubuntu-latest
+
+    outputs:
+      dotnet_version: ${{ steps.pipeline-vars.outputs.DOTNET_VERSION }}
+      deploy_env: ${{ steps.pipeline-vars.outputs.DEPLOY_ENV }}
+      solution_version: ${{ steps.pipeline-vars.outputs.SOLUTION_VERSION }}
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Get deployment variables
+        id: pipeline-vars
+        env:
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          echo "Checking .NET version..."
+
+          echo "Checking deployment environment..."
+
+          if [[ $BRANCH == "main" || $BRANCH == "master" ]]; then
+            DEPLOY_ENV="prod"
+          elif [[ $BRANCH == "staging" ]]; then
+            DEPLOY_ENV="stag"
+          else
+            DEPLOY_ENV="dev"
+          fi
+
+          echo "DEPLOY_ENV=$DEPLOY_ENV"
+          echo "DEPLOY_ENV=$DEPLOY_ENV" >> $GITHUB_OUTPUT
+
+      - name: Write pipeline vars summary
+        run: |
+          echo "### Prepare pipeline:
+          <table>
+            <tr>
+              <td>🐨 Go version</td>
+              <td>${{ steps.pipeline-vars.outputs.DOTNET_VERSION }}</td>
+            </tr>
+            <tr>
+              <td>🎯 Deployment environment</td>
+              <td>${{ steps.pipeline-vars.outputs.DEPLOY_ENV }}</td>
+            </tr>
+          </table>" >> $GITHUB_STEP_SUMMARY
