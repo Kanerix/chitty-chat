@@ -3,6 +3,7 @@ module github.com/kanerix/chitty-chat
 go 1.23.1
 
 require (
+	github.com/google/uuid v1.6.0
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/cobra v1.8.1
 	google.golang.org/grpc v1.67.1
