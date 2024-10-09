@@ -26,7 +26,7 @@ RUN go build -o bin/server server/main.go
 
 FROM alpine:3.20 AS runner
 
-WORKDIR /app
+WORKDIR /var/app
 
 COPY --from=builder /app/bin/server .
 
