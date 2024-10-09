@@ -3,41 +3,31 @@ name: Prepare pipeline and set variables
 on:
   workflow_call:
     outputs:
-      dotnet_version:
-        description: The version of .NET to use
-        value: ${{ jobs.prepare-pipeline-vars.outputs.dotnet_version }}
+      go_version:
+        description: The Go version to use
+        value: ${{ jobs.prepare-pipeline-vars.outputs.go_version }}
 
       deploy_env:
         description: Deployment environment (prod, stag or dev)
         value: ${{ jobs.prepare-pipeline-vars.outputs.deploy_env }}
-
-      solution_version:
-        description: The version of the solution
-        value: ${{ jobs.prepare-pipeline-vars.outputs.solution_version }}
 
 jobs:
   prepare-pipeline-vars:
     runs-on: ubuntu-latest
 
     outputs:
-      dotnet_version: ${{ steps.pipeline-vars.outputs.DOTNET_VERSION }}
-      deploy_env: ${{ steps.pipeline-vars.outputs.DEPLOY_ENV }}
-      solution_version: ${{ steps.pipeline-vars.outputs.SOLUTION_VERSION }}
-
-    permissions:
-      contents: write
+      go_version: ${{ steps.go-version.outputs.GO_VERSION }}
+      deploy_env: ${{ steps.deploy-env.outputs.DEPLOY_ENV }}
 
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v4
 
-      - name: Get deployment variables
-        id: pipeline-vars
+      - name: Get deployment environment
+        id: deploy-env
         env:
           BRANCH: ${{ github.ref_name }}
         run: |
-          echo "Checking .NET version..."
-
           echo "Checking deployment environment..."
 
           if [[ $BRANCH == "main" || $BRANCH == "master" ]]; then
@@ -50,6 +40,19 @@ jobs:
 
           echo "DEPLOY_ENV=$DEPLOY_ENV"
           echo "DEPLOY_ENV=$DEPLOY_ENV" >> $GITHUB_OUTPUT
+      
+      - name: Setup Go environment
+        uses: actions/setup-go@v5
+
+      - name: Get go version
+        id: go-version
+        run: |
+          echo "Checking go version..."
+
+          GO_VERSION=$(go version | awk '{print $3}')
+
+          echo "DEPLOY_ENV=$DEPLOY_ENV"
+          echo "DEPLOY_ENV=$DEPLOY_ENV" >> $GITHUB_OUTPUT
 
       - name: Write pipeline vars summary
         run: |
@@ -57,10 +60,10 @@ jobs:
           <table>
             <tr>
               <td>🐨 Go version</td>
-              <td>${{ steps.pipeline-vars.outputs.DOTNET_VERSION }}</td>
+              <td>${{ steps.go-version.outputs.GO_VERSIOn }}</td>
             </tr>
             <tr>
               <td>🎯 Deployment environment</td>
-              <td>${{ steps.pipeline-vars.outputs.DEPLOY_ENV }}</td>
+              <td>${{ steps.deploy-env.outputs.DEPLOY_ENV }}</td>
             </tr>
           </table>" >> $GITHUB_STEP_SUMMARY
