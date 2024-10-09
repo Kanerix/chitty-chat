@@ -1,0 +1,11 @@
+# Git
+README.md
+.gitignore
+
+# Genereated protobuf files
+pb
+
+# Docker
+.dockerignore
+Dockerfile
+docker-compose.yml
