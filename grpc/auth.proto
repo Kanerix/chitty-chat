@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package chitty_chat;
+
+option go_package = "./pb";
+
+service Auth {
+    rpc JoinChannel(JoinRequest) returns (JoinResponse);
+}
+
+message JoinRequest {
+    string username = 1;
+    string channel_id = 2;
+}
+
+message JoinResponse {
+    string session_token = 1;
+}

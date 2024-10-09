@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package chitty_chat;
+
+option go_package = "./pb";
+
+service Chat {
+    rpc SendMessage(MessageRequest) returns (MessageResponse);
+}
+
+message MessageRequest {
+    string message = 1;
+}
+
+message MessageResponse {}
