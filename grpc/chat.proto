@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package chitty_chat;
 
-option go_package = "./pb";
+option go_package = "./.proto-gen";
 
 service Chat {
     rpc SendMessage(MessageRequest) returns (MessageResponse);

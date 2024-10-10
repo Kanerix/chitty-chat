@@ -2,10 +2,11 @@ syntax = "proto3";
 
 package chitty_chat;
 
-option go_package = "./pb";
+option go_package = "./.proto-gen";
 
 service Auth {
-    rpc JoinChannel(JoinRequest) returns (JoinResponse);
+    rpc Login(JoinRequest) returns (JoinResponse);
+    rpc Logout(LogoutRequest) returns (LogoutResponse);
 }
 
 message JoinRequest {
@@ -13,6 +14,12 @@ message JoinRequest {
     string channel_id = 2;
 }
 
+message LogoutRequest {
+    string session_token = 1;
+}
+
 message JoinResponse {
     string session_token = 1;
 }
+
+message LogoutResponse{}
