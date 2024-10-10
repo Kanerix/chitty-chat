@@ -5,20 +5,19 @@ package chitty_chat;
 option go_package = "./.proto-gen";
 
 service Auth {
-    rpc Login(JoinRequest) returns (JoinResponse);
+    rpc Login(LoginRequest) returns (LoginResponse);
     rpc Logout(LogoutRequest) returns (LogoutResponse);
 }
 
-message JoinRequest {
+message LoginRequest {
     string username = 1;
-    string channel_id = 2;
 }
 
 message LogoutRequest {
     string session_token = 1;
 }
 
-message JoinResponse {
+message LoginResponse {
     string session_token = 1;
 }
 
