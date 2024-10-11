@@ -1,2 +1,2 @@
-.proto-gen
+proto/*.pb.go
 .DS_Store
