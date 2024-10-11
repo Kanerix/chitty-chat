@@ -1,4 +1,4 @@
-package grpc
+package auth
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 )
 
 func (s *AuthServer) Login(ctx context.Context, in *pb.LoginRequest) (*pb.LoginResponse, error) {
-	session, err := storage.Save(in.Username, in.Anonymous)
+	session, err := s.SessionStorage.Save(in.Username, in.Anonymous)
 	if err != nil {
 		return nil, status.Error(codes.AlreadyExists, err.Error())
 	}

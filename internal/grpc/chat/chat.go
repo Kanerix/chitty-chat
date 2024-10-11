@@ -1,21 +1,34 @@
-package grpc
+package chat
 
 import (
-	"context"
+	"fmt"
 
+	"github.com/kanerix/chitty-chat/internal/grpc/auth"
 	pb "github.com/kanerix/chitty-chat/proto"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type ChatServer struct {
-	pb.UnimplementedChatServer
+	pb.UnimplementedChatServiceServer
 }
 
-func (s *ChatServer) SendMessage(ctx context.Context, in *pb.MessageRequest) (*pb.MessageResponse, error) {
-	if len(in.Message) > 128 {
-		return nil, status.Error(codes.InvalidArgument, "message is too long")
-	}
+func (s *ChatServer) Chat(stream pb.ChatService_ChatServer) error {
+	for {
+		msg, err := stream.Recv()
+		if err != nil {
+			return err
+		}
 
-	return &pb.MessageResponse{}, nil
+		ctx := stream.Context()
+		session := ctx.Value(auth.SessionContextKey).(auth.Session)
+		name := session.Username
+		if session.Anonymous {
+			name = "Anonymous"
+		}
+
+		message := fmt.Sprintf("%s - %s @ %s", "TIMESTAMP", name, msg.Message)
+		err = stream.Send(&pb.Message{Message: message})
+		if err != nil {
+			return err
+		}
+	}
 }

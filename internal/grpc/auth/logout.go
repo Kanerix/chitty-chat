@@ -1,4 +1,4 @@
-package grpc
+package auth
 
 import (
 	"context"
@@ -7,5 +7,6 @@ import (
 )
 
 func (s *AuthServer) Logout(ctx context.Context, in *pb.LogoutRequest) (*pb.LogoutResponse, error) {
+	s.SessionStorage.Delete(in.SessionToken)
 	return &pb.LogoutResponse{}, nil
 }
