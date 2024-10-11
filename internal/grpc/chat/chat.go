@@ -1,18 +1,18 @@
-package main
+package grpc
 
 import (
 	"context"
 
-	"github.com/kanerix/chitty-chat/pb"
+	pb "github.com/kanerix/chitty-chat/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-type chatServer struct {
+type ChatServer struct {
 	pb.UnimplementedChatServer
 }
 
-func (s *chatServer) SendMessage(ctx context.Context, in *pb.MessageRequest) (*pb.MessageResponse, error) {
+func (s *ChatServer) SendMessage(ctx context.Context, in *pb.MessageRequest) (*pb.MessageResponse, error) {
 	if len(in.Message) > 128 {
 		return nil, status.Error(codes.InvalidArgument, "message is too long")
 	}

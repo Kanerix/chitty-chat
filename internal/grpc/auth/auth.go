@@ -1,37 +1,23 @@
-package main
+package grpc
 
 import (
 	"context"
 	"strings"
 
-	"github.com/kanerix/chitty-chat/pb"
+	pb "github.com/kanerix/chitty-chat/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
-type authServer struct {
+var storage = &InMemorySessionStore{}
+
+type AuthServer struct {
 	pb.UnimplementedAuthServer
 }
 
-func (s *authServer) JoinChannel(ctx context.Context, in *pb.JoinRequest) (*pb.JoinResponse, error) {
-	return &pb.JoinResponse{
-		SessionToken: "valid-token",
-	}, nil
-}
-
-func isValid(authorization []string) bool {
-	if len(authorization) != 1 {
-		return false
-	}
-
-	token := strings.TrimPrefix(authorization[0], "Bearer ")
-
-	return token == "valid-token"
-}
-
-func authInterceptor(
+func AuthInterceptor(
 	ctx context.Context,
 	req interface{},
 	info *grpc.UnaryServerInfo,
@@ -52,4 +38,14 @@ func authInterceptor(
 	}
 
 	return handler(ctx, req)
+}
+
+func isValid(authorization []string) bool {
+	if len(authorization) != 1 {
+		return false
+	}
+
+	token := strings.TrimPrefix(authorization[0], "Bearer ")
+
+	return token == "valid-token"
 }
