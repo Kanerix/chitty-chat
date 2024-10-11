@@ -51,8 +51,8 @@ jobs:
 
           GO_VERSION=$(go version | awk '{print $3}')
 
-          echo "DEPLOY_ENV=$DEPLOY_ENV"
-          echo "DEPLOY_ENV=$DEPLOY_ENV" >> $GITHUB_OUTPUT
+          echo "GO_VERSION=$GO_VERSION"
+          echo "GO_VERSION=$GO_VERSION" >> $GITHUB_OUTPUT
 
       - name: Write pipeline vars summary
         run: |
