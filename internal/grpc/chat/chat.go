@@ -9,6 +9,7 @@ import (
 
 type ChatServer struct {
 	pb.UnimplementedChatServiceServer
+	SessionStore *auth.InMemorySessionStore
 }
 
 func (s *ChatServer) Chat(stream pb.ChatService_ChatServer) error {
@@ -20,6 +21,7 @@ func (s *ChatServer) Chat(stream pb.ChatService_ChatServer) error {
 
 		ctx := stream.Context()
 		session := ctx.Value(auth.SessionContextKey).(auth.Session)
+
 		name := session.Username
 		if session.Anonymous {
 			name = "Anonymous"

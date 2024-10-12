@@ -7,13 +7,14 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
+	"golang.org/x/exp/maps"
 )
 
-type SessionStorage map[string]*Session
+type SessionStore map[string]*Session
 
 type InMemorySessionStore struct {
 	mutex   sync.RWMutex
-	storage SessionStorage
+	storage SessionStore
 }
 
 type Session struct {
@@ -24,7 +25,7 @@ type Session struct {
 
 func NewInMemorySessionStore() *InMemorySessionStore {
 	return &InMemorySessionStore{
-		storage: make(SessionStorage),
+		storage: make(SessionStore),
 	}
 }
 
@@ -71,6 +72,26 @@ func (store *InMemorySessionStore) Delete(username string) error {
 
 	return nil
 
+}
+
+func (store *InMemorySessionStore) List(page int) []string {
+	store.mutex.RLock()
+	defer store.mutex.RUnlock()
+
+	keys := maps.Keys(store.storage)
+
+	start := (page - 1) * 10
+	end := start + 10
+
+	if start > len(keys) {
+		return []string{}
+	}
+
+	if end > len(keys) {
+		end = len(keys)
+	}
+
+	return keys[start:end]
 }
 
 func (session *Session) String() string {

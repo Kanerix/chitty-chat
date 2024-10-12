@@ -13,8 +13,8 @@ import (
 )
 
 type AuthServer struct {
-	SessionStorage *InMemorySessionStore
 	pb.UnimplementedAuthServiceServer
+	SessionStore *InMemorySessionStore
 }
 
 type contextKey string
@@ -22,9 +22,18 @@ type contextKey string
 const SessionContextKey = contextKey("session")
 
 var NonAuthRoutes = []string{
-	"/chitty_chat.AuthService/",
+	"/chitty_chat.AuthService/Login",
 	"/grpc.health.v1.Health/",
 	"/grpc.reflection.v1.ServerReflection/",
+}
+
+type streamWrapper struct {
+	grpc.ServerStream
+	ctx context.Context
+}
+
+func (s *streamWrapper) Context() context.Context {
+	return s.ctx
 }
 
 func AuthUnaryInterceptor(
@@ -69,12 +78,15 @@ func AuthStreamInterceptor(
 		}
 
 		ctx := ss.Context()
-		_, err := isValidContext(ctx, sessionStore)
+		session, err := isValidContext(ctx, sessionStore)
 		if err != nil {
 			return err
 		}
 
-		return handler(srv, ss)
+		ctx = context.WithValue(ctx, SessionContextKey, session)
+
+		wss := &streamWrapper{ss, ctx}
+		return handler(srv, wss)
 	}
 }
 
@@ -102,7 +114,7 @@ func isValidToken(authorization []string, sessionStore *InMemorySessionStore) (*
 		return nil, errors.New("invalid authorization header")
 	}
 
-	token := strings.TrimPrefix(authorization[0], "Bearer ")
+	token := strings.Trim(authorization[0], " ")
 	sessionFromString, err := StringToSession(token)
 	if err != nil {
 		return nil, err
