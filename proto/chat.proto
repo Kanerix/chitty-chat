@@ -4,12 +4,19 @@ package chitty_chat;
 
 option go_package = "github.com/kanerix/chitty-chat/proto";
 
-service Chat {
-    rpc SendMessage(MessageRequest) returns (MessageResponse);
+service ChatService {
+    rpc Chat(stream Message) returns (stream Message);
+    rpc ListMembers(ListMembersRequest) returns (ListMembersResponse);
 }
 
-message MessageRequest {
+message Message {
     string message = 1;
 }
 
-message MessageResponse {}
+message ListMembersRequest {
+    int32 page = 1;
+}
+
+message ListMembersResponse {
+    repeated string members = 1;
+}

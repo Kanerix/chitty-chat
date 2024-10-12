@@ -4,14 +4,14 @@ package chitty_chat;
 
 option go_package = "github.com/kanerix/chitty-chat/proto";
 
-service Auth {
+service AuthService {
     rpc Login(LoginRequest) returns (LoginResponse);
     rpc Logout(LogoutRequest) returns (LogoutResponse);
 }
 
 message LoginRequest {
     string username = 1;
-    bool anonymous = 2; 
+    bool anonymous = 2 ; 
 }
 
 message LogoutRequest {
