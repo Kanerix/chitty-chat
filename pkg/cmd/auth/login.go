@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/kanerix/chitty-chat/pkg/util"
+	"github.com/kanerix/chitty-chat/pkg/session"
 	pb "github.com/kanerix/chitty-chat/proto"
 	"github.com/spf13/cobra"
 )
@@ -36,7 +36,7 @@ var loginCmd = &cobra.Command{
 			return
 		}
 
-		if err := util.SaveSessionToken(res.SessionToken); err != nil {
+		if err := session.SaveSessionToken(res.SessionToken); err != nil {
 			cmd.PrintErr(err)
 			return
 		}

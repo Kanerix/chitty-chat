@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/kanerix/chitty-chat/pkg/util"
+	"github.com/kanerix/chitty-chat/pkg/session"
 	pb "github.com/kanerix/chitty-chat/proto"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc/metadata"
@@ -21,7 +21,7 @@ var joinCmd = &cobra.Command{
 			return
 		}
 
-		token, ok := cmd.Context().Value(util.SessionContextKey).(string)
+		token, ok := cmd.Context().Value(session.SessionContextKey).(string)
 		if !ok {
 			cmd.PrintErr("could not get session token")
 			return
@@ -39,8 +39,14 @@ var joinCmd = &cobra.Command{
 			return
 		}
 
-		recv.CloseSend()
+		for {
+			msg, err := recv.Recv()
+			if err != nil {
+				cmd.PrintErr(err)
+				return
+			}
+
+			cmd.Println(msg)
+		}
 	},
 }
-
-func init() {}

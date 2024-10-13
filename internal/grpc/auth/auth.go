@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 
+	"github.com/kanerix/chitty-chat/pkg/session"
 	pb "github.com/kanerix/chitty-chat/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -14,7 +15,7 @@ import (
 
 type AuthServer struct {
 	pb.UnimplementedAuthServiceServer
-	SessionStore *InMemorySessionStore
+	SessionStore *session.InMemorySessionStore
 }
 
 type contextKey string
@@ -37,7 +38,7 @@ func (s *streamWrapper) Context() context.Context {
 }
 
 func AuthUnaryInterceptor(
-	sessionStore *InMemorySessionStore,
+	sessionStore *session.InMemorySessionStore,
 ) grpc.UnaryServerInterceptor {
 	return func(
 		ctx context.Context,
@@ -63,7 +64,7 @@ func AuthUnaryInterceptor(
 }
 
 func AuthStreamInterceptor(
-	sessionStore *InMemorySessionStore,
+	sessionStore *session.InMemorySessionStore,
 ) grpc.StreamServerInterceptor {
 	return func(
 		srv interface{},
@@ -90,7 +91,7 @@ func AuthStreamInterceptor(
 	}
 }
 
-func isValidContext(ctx context.Context, sessionStore *InMemorySessionStore) (*Session, error) {
+func isValidContext(ctx context.Context, sessionStore *session.InMemorySessionStore) (*session.Session, error) {
 	metadata, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, errors.New("missing metadata")
@@ -109,13 +110,13 @@ func isValidContext(ctx context.Context, sessionStore *InMemorySessionStore) (*S
 	return session, nil
 }
 
-func isValidToken(authorization []string, sessionStore *InMemorySessionStore) (*Session, error) {
+func isValidToken(authorization []string, sessionStore *session.InMemorySessionStore) (*session.Session, error) {
 	if len(authorization) != 1 {
 		return nil, errors.New("invalid authorization header")
 	}
 
 	token := strings.Trim(authorization[0], " ")
-	sessionFromString, err := StringToSession(token)
+	sessionFromString, err := session.StringToSession(token)
 	if err != nil {
 		return nil, err
 	}

@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/kanerix/chitty-chat/pkg/util"
+	"github.com/kanerix/chitty-chat/pkg/session"
 	pb "github.com/kanerix/chitty-chat/proto"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc/metadata"
@@ -22,7 +22,7 @@ var listCmd = &cobra.Command{
 			return
 		}
 
-		token := cmd.Context().Value(util.SessionContextKey).(string)
+		token := cmd.Context().Value(session.SessionContextKey).(string)
 		md := metadata.Pairs("authorization", token)
 		ctx := metadata.NewOutgoingContext(context.Background(), md)
 

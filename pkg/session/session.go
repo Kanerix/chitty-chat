@@ -1,16 +1,23 @@
-package auth
+package session
 
 import (
 	"errors"
 	"fmt"
-	"strings"
+	"path"
 	"sync"
 
 	"github.com/google/uuid"
+	"github.com/kanerix/chitty-chat/pkg/config"
 	"golang.org/x/exp/maps"
 )
 
+type contextKey string
+
 type SessionStore map[string]*Session
+
+const SessionContextKey = contextKey("session")
+
+var SessionFile = path.Join(config.ChippyPath, "session.txt")
 
 type InMemorySessionStore struct {
 	mutex   sync.RWMutex
@@ -101,21 +108,4 @@ func (session *Session) String() string {
 		session.Anonymous,
 		session.token,
 	)
-}
-
-func StringToSession(s string) (*Session, error) {
-	parts := strings.Split(s, ":")
-	if len(parts) != 3 {
-		return nil, errors.New("parts of session string not equal to 3")
-	}
-
-	username := parts[0]
-	anonymous := parts[1] == "true"
-	fmt.Println(parts[2])
-	token, err := uuid.Parse(parts[2])
-	if err != nil {
-		return nil, errors.New("error parsing token into UUID")
-	}
-
-	return &Session{username, anonymous, token}, nil
 }

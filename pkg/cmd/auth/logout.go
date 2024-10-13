@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/kanerix/chitty-chat/pkg/util"
+	"github.com/kanerix/chitty-chat/pkg/session"
 	pb "github.com/kanerix/chitty-chat/proto"
 	"github.com/spf13/cobra"
 )
@@ -21,7 +21,7 @@ var logoutCmd = &cobra.Command{
 			return
 		}
 
-		token, ok := cmd.Context().Value(util.SessionContextKey).(string)
+		token, ok := cmd.Context().Value(session.SessionContextKey).(string)
 		if !ok {
 			cmd.PrintErr("could not get session token")
 			return

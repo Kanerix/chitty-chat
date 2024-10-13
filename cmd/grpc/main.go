@@ -6,6 +6,7 @@ import (
 
 	grpcAuth "github.com/kanerix/chitty-chat/internal/grpc/auth"
 	grpcChat "github.com/kanerix/chitty-chat/internal/grpc/chat"
+	"github.com/kanerix/chitty-chat/pkg/session"
 	pb "github.com/kanerix/chitty-chat/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -20,7 +21,7 @@ func main() {
 
 	log.Println("server is listening on", listener.Addr().String())
 
-	var sessionStore = grpcAuth.NewInMemorySessionStore()
+	var sessionStore = session.NewInMemorySessionStore()
 
 	s := grpc.NewServer(
 		grpc.UnaryInterceptor(grpcAuth.AuthUnaryInterceptor(sessionStore)),
