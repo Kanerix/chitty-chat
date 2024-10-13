@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"github.com/kanerix/chitty-chat/pkg/session"
 	"github.com/spf13/cobra"
 )
 
@@ -12,7 +13,7 @@ var tokenCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := cmd.Context()
 
-		token, ok := ctx.Value("session").(string)
+		token, ok := ctx.Value(session.SessionContextKey).(string)
 		if !ok {
 			cmd.Println("No token found")
 			return

@@ -37,14 +37,13 @@ func init() {
 
 func getToken(cmd *cobra.Command) (string, error) {
 	token, err := cmd.Flags().GetString("token")
-	if err != nil {
+	if err != nil || token == "" {
 		token, err := session.GetSessionFileContent()
 		if err != nil {
-			cmd.PrintErr(err)
-			return string(token), nil
+			return "", err
 		}
 
-		return "", err
+		return string(token), nil
 	}
 
 	return token, nil
