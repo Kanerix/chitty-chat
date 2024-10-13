@@ -9,9 +9,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type contextKey string
-
-const ChatClientContextKey = contextKey("chat_client")
+type ChatClientKey struct{}
 
 var ChatCmd = &cobra.Command{
 	Use:   "chat",
@@ -30,7 +28,7 @@ var ChatCmd = &cobra.Command{
 
 		client := pb.NewChatServiceClient(conn)
 
-		ctx := context.WithValue(cmd.Context(), ChatClientContextKey, client)
+		ctx := context.WithValue(cmd.Context(), ChatClientKey{}, client)
 		cmd.SetContext(ctx)
 	},
 }

@@ -15,7 +15,7 @@ var loginCmd = &cobra.Command{
 	Example: "chitty auth login -u username",
 	Args:    cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		client, ok := cmd.Context().Value(AuthClientContextKey).(pb.AuthServiceClient)
+		client, ok := cmd.Context().Value(AuthClientKey{}).(pb.AuthServiceClient)
 		if !ok {
 			cmd.PrintErr("could not get auth client")
 			return

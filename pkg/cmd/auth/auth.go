@@ -9,9 +9,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type contextKey string
-
-const AuthClientContextKey = contextKey("auth_client")
+type AuthClientKey struct{}
 
 var AuthCmd = &cobra.Command{
 	Use:   "auth",
@@ -26,7 +24,7 @@ var AuthCmd = &cobra.Command{
 
 		client := pb.NewAuthServiceClient(conn)
 
-		ctx := context.WithValue(cmd.Context(), AuthClientContextKey, client)
+		ctx := context.WithValue(cmd.Context(), AuthClientKey{}, client)
 		cmd.SetContext(ctx)
 	},
 }

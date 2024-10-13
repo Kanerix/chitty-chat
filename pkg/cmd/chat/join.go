@@ -2,7 +2,8 @@ package chat
 
 import (
 	"context"
-	"time"
+	"fmt"
+	"log"
 
 	"github.com/kanerix/chitty-chat/pkg/session"
 	pb "github.com/kanerix/chitty-chat/proto"
@@ -15,13 +16,13 @@ var joinCmd = &cobra.Command{
 	Short:   "Join the chat on the chitty-chat server",
 	Example: "chitty chat join -H localhost:8080",
 	Run: func(cmd *cobra.Command, args []string) {
-		client, ok := cmd.Context().Value(ChatClientContextKey).(pb.ChatServiceClient)
+		client, ok := cmd.Context().Value(ChatClientKey{}).(pb.ChatServiceClient)
 		if !ok {
 			cmd.PrintErr("could not get chat client")
 			return
 		}
 
-		token, ok := cmd.Context().Value(session.SessionContextKey).(string)
+		token, ok := cmd.Context().Value(session.SessionKey{}).(string)
 		if !ok {
 			cmd.PrintErr("could not get session token")
 			return
@@ -30,23 +31,29 @@ var joinCmd = &cobra.Command{
 		md := metadata.Pairs("authorization", token)
 		ctx := metadata.NewOutgoingContext(context.Background(), md)
 
-		ctx, cancel := context.WithTimeout(ctx, time.Second)
-		defer cancel()
-
-		recv, err := client.Chat(ctx)
+		stream, err := client.Chat(ctx)
 		if err != nil {
 			cmd.PrintErr(err)
 			return
 		}
 
+		stream.Send(&pb.Message{
+			Message: "I joined the channel",
+		})
+
 		for {
-			msg, err := recv.Recv()
+			log.Println("Waiting for message")
+			msg, err := stream.Recv()
 			if err != nil {
 				cmd.PrintErr(err)
 				return
 			}
 
-			cmd.Println(msg)
+			stream.Send(&pb.Message{
+				Message: "I received your message",
+			})
+
+			fmt.Println(msg)
 		}
 	},
 }

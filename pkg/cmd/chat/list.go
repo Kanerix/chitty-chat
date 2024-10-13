@@ -16,13 +16,13 @@ var listCmd = &cobra.Command{
 	Example: "chitty chat list 1",
 	Args:    cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		client, ok := cmd.Context().Value(ChatClientContextKey).(pb.ChatServiceClient)
+		client, ok := cmd.Context().Value(ChatClientKey{}).(pb.ChatServiceClient)
 		if !ok {
 			cmd.PrintErr("could not get chat client")
 			return
 		}
 
-		token := cmd.Context().Value(session.SessionContextKey).(string)
+		token := cmd.Context().Value(session.SessionKey{}).(string)
 		md := metadata.Pairs("authorization", token)
 		ctx := metadata.NewOutgoingContext(context.Background(), md)
 

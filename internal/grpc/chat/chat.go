@@ -21,7 +21,7 @@ func (s *ChatServer) Chat(stream pb.ChatService_ChatServer) error {
 		}
 
 		ctx := stream.Context()
-		session := ctx.Value(auth.SessionContextKey).(session.Session)
+		session := ctx.Value(auth.SessionContextKey).(*session.Session)
 
 		name := session.Username
 		if session.Anonymous {

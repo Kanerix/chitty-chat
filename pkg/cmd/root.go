@@ -21,7 +21,7 @@ var RootCmd = &cobra.Command{
 			return
 		}
 
-		ctx := context.WithValue(cmd.Context(), session.SessionContextKey, session_token)
+		ctx := context.WithValue(cmd.Context(), session.SessionKey{}, session_token)
 		cmd.SetContext(ctx)
 	},
 }

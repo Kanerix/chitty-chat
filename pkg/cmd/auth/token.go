@@ -13,7 +13,7 @@ var tokenCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := cmd.Context()
 
-		token, ok := ctx.Value(session.SessionContextKey).(string)
+		token, ok := ctx.Value(session.SessionKey{}).(string)
 		if !ok {
 			cmd.Println("No token found")
 			return

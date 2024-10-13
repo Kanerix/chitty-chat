@@ -15,13 +15,13 @@ var logoutCmd = &cobra.Command{
 	Example: "chitty auth logout",
 	Args:    cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		client, ok := cmd.Context().Value(AuthClientContextKey).(pb.AuthServiceClient)
+		client, ok := cmd.Context().Value(AuthClientKey{}).(pb.AuthServiceClient)
 		if !ok {
 			cmd.PrintErr("could not get auth client")
 			return
 		}
 
-		token, ok := cmd.Context().Value(session.SessionContextKey).(string)
+		token, ok := cmd.Context().Value(session.SessionKey{}).(string)
 		if !ok {
 			cmd.PrintErr("could not get session token")
 			return
