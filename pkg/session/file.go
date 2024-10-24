@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func StringToSession(s string) (*Session, error) {
+func FromString(s string) (*Session, error) {
 	parts := strings.Split(s, ":")
 	if len(parts) != 3 {
 		return nil, errors.New("parts of session string not equal to 3")

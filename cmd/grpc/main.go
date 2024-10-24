@@ -29,12 +29,8 @@ func main() {
 	)
 	reflection.Register(s)
 
-	pb.RegisterAuthServiceServer(s, &grpcAuth.AuthServer{
-		SessionStore: sessionStore,
-	})
-	pb.RegisterChatServiceServer(s, &grpcChat.ChatServer{
-		SessionStore: sessionStore,
-	})
+	pb.RegisterAuthServiceServer(s, grpcAuth.NewAuthServer(sessionStore))
+	pb.RegisterChatServiceServer(s, grpcChat.NewChatServer(sessionStore))
 
 	if err := s.Serve(listener); err != nil {
 		log.Println("failed to serve:", err)

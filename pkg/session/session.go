@@ -11,8 +11,6 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-type SessionKey struct{}
-
 type SessionStore map[string]*Session
 
 var SessionFile = path.Join(config.ChippyPath, "session.txt")

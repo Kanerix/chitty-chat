@@ -1,30 +1,18 @@
 package cmd
 
 import (
-	"context"
-
-	"github.com/kanerix/chitty-chat/pkg/cmd/auth"
-	"github.com/kanerix/chitty-chat/pkg/cmd/chat"
+	"github.com/kanerix/chitty-chat/internal/cmd/auth"
+	"github.com/kanerix/chitty-chat/internal/cmd/chat"
 	"github.com/kanerix/chitty-chat/pkg/session"
 	"github.com/spf13/cobra"
 )
 
+type TokenKey struct{}
+
 var RootCmd = &cobra.Command{
-	Use:              "chitty",
-	Short:            "The Chitty-Chat chat client!",
-	Args:             cobra.MinimumNArgs(1),
-	TraverseChildren: true,
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		session_token, err := getToken(cmd)
-		if err != nil {
-			return err
-		}
-
-		ctx := context.WithValue(cmd.Context(), session.SessionKey{}, session_token)
-		cmd.SetContext(ctx)
-
-		return nil
-	},
+	Use:   "chitty",
+	Short: "The Chitty-Chat chat client!",
+	Args:  cobra.MinimumNArgs(1),
 }
 
 func init() {

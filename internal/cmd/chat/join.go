@@ -1,13 +1,16 @@
 package chat
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/kanerix/chitty-chat/pkg/session"
 	pb "github.com/kanerix/chitty-chat/proto"
 	"github.com/spf13/cobra"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -31,9 +34,7 @@ var joinCmd = &cobra.Command{
 			return err
 		}
 
-		stream.Send(&pb.Message{
-			Message: "I joined the channel",
-		})
+		go sendMessage(stream)
 
 		for {
 			log.Println("Waiting for message")
@@ -49,4 +50,18 @@ var joinCmd = &cobra.Command{
 			fmt.Println(msg)
 		}
 	},
+}
+
+func sendMessage(stream grpc.BidiStreamingClient[pb.Message, pb.Message]) {
+	input := bufio.NewScanner(os.Stdin)
+
+	select {
+	case <-stream.Context().Done():
+		log.Println("Connection is closed")
+		return
+	default:
+		stream.Send(&pb.Message{
+			Message: input.Text(),
+		})
+	}
 }

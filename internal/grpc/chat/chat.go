@@ -5,40 +5,48 @@ import (
 
 	"github.com/kanerix/chitty-chat/pkg/session"
 	pb "github.com/kanerix/chitty-chat/proto"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type ChatServer struct {
 	pb.UnimplementedChatServiceServer
-	SessionStore *session.InMemorySessionStore
-	participants []*pb.ChatService_ChatServer
+	SessionStore  *session.InMemorySessionStore
+	broadcastChan chan *pb.Message
+	clients       map[string]*pb.Message
 }
 
-func (s *ChatServer) Chat(stream pb.ChatService_ChatServer) error {
+func NewChatServer(sessionStore *session.InMemorySessionStore) *ChatServer {
+	return &ChatServer{
+		SessionStore:  sessionStore,
+		broadcastChan: make(chan *pb.Message, 10),
+		clients:       make(map[string]*pb.Message),
+	}
+}
+
+func (s *ChatServer) Chat(server pb.ChatService_ChatServer) error {
 	for {
-		msg, err := stream.Recv()
+		request, err := server.Recv()
 		if err != nil {
 			return err
 		}
 
-		ctx := stream.Context()
-		session := ctx.Value(session.SessionKey{}).(*session.Session)
+		session, ok := session.FromContext(server.Context())
+		if !ok {
+			return status.Error(codes.Unauthenticated, "no active session")
+		}
 
 		name := session.Username
 		if session.Anonymous {
 			name = "Anonymous"
 		}
 
-		message := fmt.Sprintf("%s - %s @ %s", "TIMESTAMP", name, msg.Message)
-		err = stream.Send(&pb.Message{Message: message})
-		if err != nil {
-			return err
-		}
+		fmt.Println(name, "-", request.Message)
 	}
 }
 
-func (s *ChatServer) Broadcast(msg string) error {
-	s.SessionStore.RLock()
-	defer s.SessionStore.RUnlock()
-
-	return nil
+func (s *ChatServer) Broadcast(message string) {
+	for _, conn := range s.clients {
+		fmt.Println(conn.Message)
+	}
 }
