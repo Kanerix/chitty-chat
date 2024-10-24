@@ -9,6 +9,10 @@ import (
 )
 
 func (s *ChatServer) ListMembers(ctx context.Context, in *pb.ListMembersRequest) (*pb.ListMembersResponse, error) {
+	if in.Page < 1 {
+		return nil, status.Error(codes.InvalidArgument, "Page can't be les than 0")
+	}
+
 	usernames := s.SessionStore.List(int(in.Page))
 
 	if len(usernames) == 0 {

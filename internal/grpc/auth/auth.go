@@ -18,10 +18,6 @@ type AuthServer struct {
 	SessionStore *session.InMemorySessionStore
 }
 
-type contextKey string
-
-const SessionContextKey = contextKey("session")
-
 var NonAuthRoutes = []string{
 	"/chitty_chat.AuthService/Login",
 	"/grpc.health.v1.Health/",
@@ -33,31 +29,27 @@ type streamWrapper struct {
 	ctx context.Context
 }
 
-func (s *streamWrapper) Context() context.Context {
-	return s.ctx
-}
-
 func AuthUnaryInterceptor(
 	sessionStore *session.InMemorySessionStore,
 ) grpc.UnaryServerInterceptor {
 	return func(
 		ctx context.Context,
-		req interface{},
+		req any,
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler,
-	) (interface{}, error) {
+	) (any, error) {
 		for _, route := range NonAuthRoutes {
 			if strings.HasPrefix(info.FullMethod, route) {
 				return handler(ctx, req)
 			}
 		}
 
-		session, err := isValidContext(ctx, sessionStore)
+		session_token, err := isValidContext(ctx, sessionStore)
 		if err != nil {
 			return nil, status.Error(codes.Unauthenticated, err.Error())
 		}
 
-		ctx = context.WithValue(ctx, SessionContextKey, session)
+		ctx = context.WithValue(ctx, session.SessionKey{}, session_token)
 
 		return handler(ctx, req)
 	}
@@ -67,7 +59,7 @@ func AuthStreamInterceptor(
 	sessionStore *session.InMemorySessionStore,
 ) grpc.StreamServerInterceptor {
 	return func(
-		srv interface{},
+		srv any,
 		ss grpc.ServerStream,
 		info *grpc.StreamServerInfo,
 		handler grpc.StreamHandler,
@@ -79,40 +71,46 @@ func AuthStreamInterceptor(
 		}
 
 		ctx := ss.Context()
-		session, err := isValidContext(ctx, sessionStore)
+		session_token, err := isValidContext(ctx, sessionStore)
 		if err != nil {
-			return err
+			return status.Error(codes.Unauthenticated, err.Error())
 		}
 
-		ctx = context.WithValue(ctx, SessionContextKey, session)
+		ctx = context.WithValue(ctx, session.SessionKey{}, session_token)
 
 		wss := &streamWrapper{ss, ctx}
 		return handler(srv, wss)
 	}
 }
 
-func isValidContext(ctx context.Context, sessionStore *session.InMemorySessionStore) (*session.Session, error) {
+func isValidContext(
+	ctx context.Context,
+	sessionStore *session.InMemorySessionStore,
+) (*session.Session, error) {
 	metadata, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return nil, errors.New("missing metadata")
+		return nil, ErrUnauthorized
 	}
 
 	token, exsists := metadata["authorization"]
 	if !exsists {
-		return nil, errors.New("session token not found")
+		return nil, ErrUnauthorized
 	}
 
 	session, err := isValidToken(token, sessionStore)
 	if err != nil {
-		return nil, err
+		return nil, ErrUnauthorized
 	}
 
 	return session, nil
 }
 
-func isValidToken(authorization []string, sessionStore *session.InMemorySessionStore) (*session.Session, error) {
+func isValidToken(
+	authorization []string,
+	sessionStore *session.InMemorySessionStore,
+) (*session.Session, error) {
 	if len(authorization) != 1 {
-		return nil, errors.New("invalid authorization header")
+		return nil, ErrUnauthorized
 	}
 
 	token := strings.Trim(authorization[0], " ")
@@ -128,3 +126,7 @@ func isValidToken(authorization []string, sessionStore *session.InMemorySessionS
 
 	return session, nil
 }
+
+var (
+	ErrUnauthorized = errors.New("unauthorized for resource")
+)

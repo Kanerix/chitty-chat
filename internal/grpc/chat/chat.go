@@ -3,7 +3,6 @@ package chat
 import (
 	"fmt"
 
-	"github.com/kanerix/chitty-chat/internal/grpc/auth"
 	"github.com/kanerix/chitty-chat/pkg/session"
 	pb "github.com/kanerix/chitty-chat/proto"
 )
@@ -11,6 +10,7 @@ import (
 type ChatServer struct {
 	pb.UnimplementedChatServiceServer
 	SessionStore *session.InMemorySessionStore
+	participants []*pb.ChatService_ChatServer
 }
 
 func (s *ChatServer) Chat(stream pb.ChatService_ChatServer) error {
@@ -21,7 +21,7 @@ func (s *ChatServer) Chat(stream pb.ChatService_ChatServer) error {
 		}
 
 		ctx := stream.Context()
-		session := ctx.Value(auth.SessionContextKey).(*session.Session)
+		session := ctx.Value(session.SessionKey{}).(*session.Session)
 
 		name := session.Username
 		if session.Anonymous {
@@ -34,4 +34,11 @@ func (s *ChatServer) Chat(stream pb.ChatService_ChatServer) error {
 			return err
 		}
 	}
+}
+
+func (s *ChatServer) Broadcast(msg string) error {
+	s.SessionStore.RLock()
+	defer s.SessionStore.RUnlock()
+
+	return nil
 }
