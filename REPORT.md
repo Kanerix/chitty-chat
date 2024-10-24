@@ -1,6 +1,6 @@
 # CHITTY-CHAT
 
-## 1 Streaming
+## 1. Streaming
 
 When deciding between server-side streaming, client-side streaming, or bidirectional streaming,
 it's important to understand the differences between each.
@@ -27,31 +27,72 @@ chat applications or collaborative tools.
 
 Since this application is a chat server, bidirectional streaming is best for the purpose of the project.
 
-## 2 System architecture
+## 2. System architecture
 
 This project uses a client-server architecture for communication. The client connects to the chat server and messages
 is streamed between the server and the client. The clients are never directly exposed to eachother.
 
-## 3 RPC methods
+## 3. RPC methods
 
-- [ ] Describe what  RPC methods are implemented, of what type, and what messages types are used for communication
+Only 1 RPC method is used called broadcast. It takes a stream of chat events and returns a stream of chat messages.
 
-## 4  Lamport timestamps
+```proto
+service Chat {
+    rpc Broadcast(stream ChatEvent) returns (stream ChatMessage);
+}
+```
+
+A chat event is either a join, leave or message event.
+
+```proto
+message ChatEvent {
+    oneof event {
+        UserJoin join = 2;
+        UserLeave leave = 3;
+        ChatMessage message = 4;
+    }
+
+    message UserJoin {
+        string username = 1;
+    }
+
+    message UserLeave {
+        string username = 1;
+    }
+
+    message ChatMessage {
+        string username = 1;
+        string message = 2;
+    }
+}
+```
+
+The RPC then turns the event into a message and streams it back to the client.
+
+```proto
+message ChatMessage {
+    uint64 timestamp = 1;
+    string username = 2;
+    string message = 3;
+}
+```
+
+## 4. Lamport timestamps
 
 - [ ] Describe how you have implemented the calculation of the Lamport timestamps
 
-## 5 Diagram of lamport
+## 5. Diagram of lamport
 
 - [ ] Provide a diagram, that traces a sequence of RPC calls together with the Lamport timestamps, that corresponds to a chosen sequence of interactions: Client X joins, Client X Publishes, ..., Client X leaves. Include documentation (system logs) in your appendix.
 
-## Github repository
+## 6. Github repository
 
-- [ ] Provide a link to a Git repo with your source code in the report
+<https://github.com/Kanerix/chitty-chat>
 
-## System logs
+## 7. System logs
 
-- [ ] Include system logs, that document the requirements are met, in the appendix of your report
+The [systems logs](https://github.com/Kanerix/chitty-chat/blob/main/example.log) can be found in the GitHub repo.
 
-## README.md
+## 8. README.md
 
-- [ ] Include a readme.md file that describes how to run your program.
+The [README.md](https://github.com/Kanerix/chitty-chat/blob/main/readme.log) can be found in the GitHub repo.

@@ -35,7 +35,7 @@ We call clients of the Chitty-Chat service Participants.
 - [ ] Describe how you have implemented the calculation of the Lamport timestamps
 - [ ] Provide a diagram, that traces a sequence of RPC calls together with the Lamport timestamps, that corresponds to a chosen sequence of interactions: Client X joins, Client X Publishes, ..., Client X leaves. Include documentation (system logs) in your appendix.
 - [ ] Provide a link to a Git repo with your source code in the report
-- [ ] Include system logs, that document the requirements are met, in the appendix of your report
+- [x] Include system logs, that document the requirements are met, in the appendix of your report
 - [ ] Include a readme.md file that describes how to run your program.
 
 ## Grading notes
