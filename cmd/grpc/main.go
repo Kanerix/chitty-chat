@@ -4,9 +4,7 @@ import (
 	"log"
 	"net"
 
-	grpcAuth "github.com/kanerix/chitty-chat/internal/grpc/auth"
-	grpcChat "github.com/kanerix/chitty-chat/internal/grpc/chat"
-	"github.com/kanerix/chitty-chat/pkg/session"
+	grpcChat "github.com/kanerix/chitty-chat/internal/grpc"
 	pb "github.com/kanerix/chitty-chat/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -21,16 +19,10 @@ func main() {
 
 	log.Println("server is listening on", listener.Addr().String())
 
-	var sessionStore = session.NewInMemorySessionStore()
-
-	s := grpc.NewServer(
-		grpc.UnaryInterceptor(grpcAuth.AuthUnaryInterceptor(sessionStore)),
-		grpc.StreamInterceptor(grpcAuth.AuthStreamInterceptor(sessionStore)),
-	)
+	s := grpc.NewServer()
 	reflection.Register(s)
 
-	pb.RegisterAuthServiceServer(s, grpcAuth.NewAuthServer(sessionStore))
-	pb.RegisterChatServiceServer(s, grpcChat.NewChatServer(sessionStore))
+	pb.RegisterChatServer(s, grpcChat.NewChatServer())
 
 	if err := s.Serve(listener); err != nil {
 		log.Println("failed to serve:", err)
