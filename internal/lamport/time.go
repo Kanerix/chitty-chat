@@ -4,10 +4,14 @@ import (
 	"sync/atomic"
 )
 
-type LamportClock struct {
+type Clock struct {
 	time atomic.Uint64
 }
 
-func (lc *LamportClock) Add() {
-	lc.time.Add(1)
+func (c *Clock) Now() uint64 {
+	return c.time.Load()
+}
+
+func (c *Clock) Step() {
+	c.time.Add(1)
 }

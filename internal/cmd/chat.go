@@ -1,9 +1,12 @@
 package cmd
 
 import (
+	"bufio"
 	"context"
 	"fmt"
-	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	pb "github.com/kanerix/chitty-chat/proto"
 	"github.com/spf13/cobra"
@@ -31,12 +34,25 @@ var chatCmd = &cobra.Command{
 			return err
 		}
 
-		joinChat(stream)
+		shutdown := make(chan os.Signal, 1)
+		signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
 
-		go messageListener(stream)
+		ch := make(chan error)
 
-		<-stream.Context().Done()
-		return nil
+		go joinChat(stream, ch)
+		go leaveChat(stream, shutdown)
+
+		go messageListener(stream, ch)
+		go inputListener(stream, ch)
+
+		for {
+			select {
+			case err := <-ch:
+				cmd.PrintErrln(err)
+			case <-stream.Context().Done():
+				return nil
+			}
+		}
 	},
 }
 
@@ -51,23 +67,57 @@ func init() {
 	chatCmd.MarkFlagRequired("username")
 }
 
-func joinChat(stream pb.Chat_BroadcastClient) {
-	stream.Send(&pb.ChatEvent{
+func joinChat(stream pb.Chat_BroadcastClient, errorCh chan error) {
+	if err := stream.Send(&pb.ChatEvent{
 		Event: &pb.ChatEvent_Join{
 			Join: &pb.ChatEvent_UserJoin{
 				Username: username,
 			},
 		},
-	})
+	}); err != nil {
+		errorCh <- err
+	}
 }
 
-func messageListener(stream pb.Chat_BroadcastClient) {
+func leaveChat(stream pb.Chat_BroadcastClient, shutdown chan os.Signal) {
+	<-shutdown
+
+	stream.Send(&pb.ChatEvent{
+		Event: &pb.ChatEvent_Leave{
+			Leave: &pb.ChatEvent_UserLeave{
+				Username: username,
+			},
+		},
+	})
+
+	os.Exit(0)
+}
+
+func messageListener(stream pb.Chat_BroadcastClient, errorCh chan error) {
 	for {
 		req, err := stream.Recv()
 		if err != nil {
-			log.Fatalln(err.Error())
+			errorCh <- err
 		}
 
 		fmt.Printf("%d @ %s - %s\n", req.Timestamp, req.Username, req.Message)
+	}
+}
+
+func inputListener(stream pb.Chat_BroadcastClient, errorCh chan error) error {
+	for {
+		input := bufio.NewScanner(os.Stdin)
+		input.Scan()
+
+		if err := stream.Send(&pb.ChatEvent{
+			Event: &pb.ChatEvent_Message{
+				Message: &pb.ChatEvent_ChatMessage{
+					Username: username,
+					Message:  input.Text(),
+				},
+			},
+		}); err != nil {
+			errorCh <- err
+		}
 	}
 }
