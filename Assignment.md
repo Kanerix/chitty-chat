@@ -12,14 +12,14 @@ We call clients of the Chitty-Chat service Participants.
 - [ ] R4: When a client receives a broadcasted message, it has to write the message and the current logical timestamp to the log
 - [ ] R5: Chat clients can join at any time.
 - [ ] R6: A "Participant X  joined Chitty-Chat at Lamport time L" message is broadcast to all Participants when client X joins, including the new Participant.
-- [ ] R7: Chat clients can drop out at any time.
+- [x] R7: Chat clients can drop out at any time.
 - [ ] R8: A "Participant X left Chitty-Chat at Lamport time L" message is broadcast to all remaining Participants when Participant X leaves.
 
 ## Technical Requirements
 
-- [ ] Use gRPC for all messages passing between nodes
-- [ ] Use Golang to implement the service and clients
-- [ ] Every client has to be deployed as a separate process
+- [x] Use gRPC for all messages passing between nodes
+- [x] Use Golang to implement the service and clients
+- [x] Every client has to be deployed as a separate process
 - [ ] Log all service calls (Publish, Broadcast, ...) using the log package
 - [ ] Demonstrate that the system can be started with at least 3 client nodes
 - [ ] Demonstrate that a client node can join the system
