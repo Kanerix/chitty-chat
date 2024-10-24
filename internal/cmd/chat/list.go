@@ -13,14 +13,10 @@ import (
 var listCmd = &cobra.Command{
 	Use:     "list",
 	Short:   "List all members currently on the chitty-chat server",
-	Example: "chitty chat list 1",
+	Example: "chitty chat list",
 	Args:    cobra.ExactArgs(0),
-	Run: func(cmd *cobra.Command, args []string) {
-		client, ok := cmd.Context().Value(ChatClientKey{}).(pb.ChatServiceClient)
-		if !ok {
-			cmd.PrintErr("could not get chat client")
-			return
-		}
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client := cmd.Context().Value(ChatClientKey{}).(pb.ChatServiceClient)
 
 		token := cmd.Context().Value(session.SessionKey{}).(string)
 		md := metadata.Pairs("authorization", token)
@@ -29,12 +25,24 @@ var listCmd = &cobra.Command{
 		ctx, cancel := context.WithTimeout(ctx, time.Second)
 		defer cancel()
 
-		client.ListMembers(ctx, &pb.ListMembersRequest{
-			Page: 0,
-		})
+		page, err := cmd.Flags().GetInt32("page")
+		if err != nil {
+			return err
+		}
+
+		res, err := client.ListMembers(ctx, &pb.ListMembersRequest{Page: page})
+		if err != nil {
+			return err
+		}
+
+		for _, member := range res.Members {
+			cmd.Println(member)
+		}
+
+		return nil
 	},
 }
 
 func init() {
-	listCmd.Flags().StringP("page", "p", "0", "The page number of the users")
+	listCmd.Flags().Int32P("page", "p", 1, "The page number of the users")
 }

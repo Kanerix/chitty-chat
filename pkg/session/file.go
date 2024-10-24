@@ -2,8 +2,8 @@ package session
 
 import (
 	"errors"
-	"fmt"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/google/uuid"
@@ -17,7 +17,6 @@ func StringToSession(s string) (*Session, error) {
 
 	username := parts[0]
 	anonymous := parts[1] == "true"
-	fmt.Println(parts[2])
 	token, err := uuid.Parse(parts[2])
 	if err != nil {
 		return nil, errors.New("error parsing token into UUID")
@@ -27,15 +26,16 @@ func StringToSession(s string) (*Session, error) {
 }
 
 func GetSessionFileContent() ([]byte, error) {
-	if _, err := os.Stat(SessionFile); err != nil {
-		if os.IsNotExist(err) {
-			_, err := os.Create(SessionFile)
-			if err != nil {
-				return nil, err
-			}
-		}
+	err := os.MkdirAll(path.Dir(SessionFile), os.ModePerm)
+	if err != nil {
 		return nil, err
 	}
+
+	file, err := os.OpenFile(SessionFile, os.O_RDWR|os.O_CREATE, 0600)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
 
 	return os.ReadFile(SessionFile)
 }

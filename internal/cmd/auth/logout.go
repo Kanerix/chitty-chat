@@ -14,17 +14,12 @@ var logoutCmd = &cobra.Command{
 	Short:   "Logout of the chitty-chat server",
 	Example: "chitty auth logout",
 	Args:    cobra.ExactArgs(0),
-	Run: func(cmd *cobra.Command, args []string) {
-		client, ok := cmd.Context().Value(AuthClientKey{}).(pb.AuthServiceClient)
-		if !ok {
-			cmd.PrintErr("could not get auth client")
-			return
-		}
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client := cmd.Context().Value(AuthClientKey{}).(pb.AuthServiceClient)
 
 		token, ok := cmd.Context().Value(session.SessionKey{}).(string)
 		if !ok {
-			cmd.PrintErr("could not get session token")
-			return
+			return session.ErrSessionKeyNotFound
 		}
 
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
@@ -34,8 +29,9 @@ var logoutCmd = &cobra.Command{
 			SessionToken: token,
 		})
 		if err != nil {
-			cmd.PrintErr(err)
-			return
+			return err
 		}
+
+		return nil
 	},
 }

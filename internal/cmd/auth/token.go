@@ -10,15 +10,16 @@ var tokenCmd = &cobra.Command{
 	Short:   "Shows the current session token",
 	Example: "chitty auth token",
 	Args:    cobra.ExactArgs(0),
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := cmd.Context()
 
 		token, ok := ctx.Value(session.SessionKey{}).(string)
 		if !ok {
-			cmd.Println("No token found")
-			return
+			return session.ErrSessionKeyNotFound
 		}
 
 		cmd.Println(token)
+
+		return nil
 	},
 }

@@ -14,7 +14,7 @@ type ChatClientKey struct{}
 var ChatCmd = &cobra.Command{
 	Use:   "chat",
 	Short: "Chat with other users on the chitty-chat server",
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		if cmd.PersistentPreRun != nil {
 			cmd.PersistentPreRun(cmd, args)
 		}
@@ -22,14 +22,15 @@ var ChatCmd = &cobra.Command{
 		host := cmd.Flag("host").Value.String()
 		conn, err := grpc.NewClient(host, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
-			cmd.PrintErr(err)
-			return
+			return err
 		}
 
 		client := pb.NewChatServiceClient(conn)
 
 		ctx := context.WithValue(cmd.Context(), ChatClientKey{}, client)
 		cmd.SetContext(ctx)
+
+		return nil
 	},
 }
 

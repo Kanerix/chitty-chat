@@ -14,18 +14,19 @@ type AuthClientKey struct{}
 var AuthCmd = &cobra.Command{
 	Use:   "auth",
 	Short: "Authenticate with the chitty-chat server",
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		host := cmd.Flag("host").Value.String()
 		conn, err := grpc.NewClient(host, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
-			cmd.PrintErr(err)
-			return
+			return err
 		}
 
 		client := pb.NewAuthServiceClient(conn)
 
 		ctx := context.WithValue(cmd.Context(), AuthClientKey{}, client)
 		cmd.SetContext(ctx)
+
+		return nil
 	},
 }
 

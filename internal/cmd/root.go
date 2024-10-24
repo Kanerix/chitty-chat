@@ -14,15 +14,16 @@ var RootCmd = &cobra.Command{
 	Short:            "The Chitty-Chat chat client!",
 	Args:             cobra.MinimumNArgs(1),
 	TraverseChildren: true,
-	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		session_token, err := getToken(cmd)
 		if err != nil {
-			cmd.PrintErr(err)
-			return
+			return err
 		}
 
 		ctx := context.WithValue(cmd.Context(), session.SessionKey{}, session_token)
 		cmd.SetContext(ctx)
+
+		return nil
 	},
 }
 

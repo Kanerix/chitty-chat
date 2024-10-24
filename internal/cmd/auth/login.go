@@ -14,15 +14,18 @@ var loginCmd = &cobra.Command{
 	Short:   "Login to the chitty-chat server",
 	Example: "chitty auth login -u username",
 	Args:    cobra.ExactArgs(0),
-	Run: func(cmd *cobra.Command, args []string) {
-		client, ok := cmd.Context().Value(AuthClientKey{}).(pb.AuthServiceClient)
-		if !ok {
-			cmd.PrintErr("could not get auth client")
-			return
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client := cmd.Context().Value(AuthClientKey{}).(pb.AuthServiceClient)
+
+		username, err := cmd.Flags().GetString("username")
+		if err != nil {
+			return err
 		}
 
-		username, _ := cmd.Flags().GetString("username")
-		anonymous, _ := cmd.Flags().GetBool("anonymous")
+		anonymous, err := cmd.Flags().GetBool("anonymous")
+		if err != nil {
+			return err
+		}
 
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 		defer cancel()
@@ -32,18 +35,18 @@ var loginCmd = &cobra.Command{
 			Username:  username,
 		})
 		if err != nil {
-			cmd.PrintErr(err)
-			return
+			return err
 		}
 
 		if err := session.SaveSessionToken(res.SessionToken); err != nil {
-			cmd.PrintErr(err)
-			return
+			return err
 		}
 
 		if show, _ := cmd.Flags().GetBool("show"); show {
 			cmd.Println(res.SessionToken)
 		}
+
+		return nil
 	},
 }
 

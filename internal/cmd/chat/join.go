@@ -15,17 +15,12 @@ var joinCmd = &cobra.Command{
 	Use:     "join",
 	Short:   "Join the chat on the chitty-chat server",
 	Example: "chitty chat join -H localhost:8080",
-	Run: func(cmd *cobra.Command, args []string) {
-		client, ok := cmd.Context().Value(ChatClientKey{}).(pb.ChatServiceClient)
-		if !ok {
-			cmd.PrintErr("could not get chat client")
-			return
-		}
+	RunE: func(cmd *cobra.Command, args []string) error {
+		client := cmd.Context().Value(ChatClientKey{}).(pb.ChatServiceClient)
 
 		token, ok := cmd.Context().Value(session.SessionKey{}).(string)
 		if !ok {
-			cmd.PrintErr("could not get session token")
-			return
+			return session.ErrSessionKeyNotFound
 		}
 
 		md := metadata.Pairs("authorization", token)
@@ -33,8 +28,7 @@ var joinCmd = &cobra.Command{
 
 		stream, err := client.Chat(ctx)
 		if err != nil {
-			cmd.PrintErr(err)
-			return
+			return err
 		}
 
 		stream.Send(&pb.Message{
@@ -45,8 +39,7 @@ var joinCmd = &cobra.Command{
 			log.Println("Waiting for message")
 			msg, err := stream.Recv()
 			if err != nil {
-				cmd.PrintErr(err)
-				return
+				return err
 			}
 
 			stream.Send(&pb.Message{
