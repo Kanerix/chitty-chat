@@ -65,6 +65,7 @@ func (bs *BroadcastStream) SendMessage(username string, message string) error {
 		Event: &pb.ChatEvent_Message{
 			Message: &pb.ChatEvent_ChatMessage{
 				Username: username,
+				Message:  message,
 			},
 		},
 	}); err != nil {

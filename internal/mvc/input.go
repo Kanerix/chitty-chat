@@ -28,8 +28,6 @@ func NewInputArea() InputArea {
 	return area
 }
 
-func (nv InputArea) Update(msg tea.Msg) (InputArea, tea.Cmd) {
-	area, cmd := nv.Model.Update(msg)
-	nv = InputArea{Model: area}
-	return nv, cmd
+func (ia InputArea) Init() tea.Cmd {
+	return textarea.Blink
 }

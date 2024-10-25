@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"strings"
 	"sync"
 
@@ -32,10 +33,7 @@ func (s *ChatServer) Broadcast(stream pb.Chat_BroadcastServer) error {
 		}
 
 		if err := s.process(req, stream); err != nil {
-			switch err {
-			case ErrInvalidUsername:
-
-			}
+			return err
 		}
 	}
 }
@@ -57,12 +55,13 @@ func (s *ChatServer) userJoin(event *pb.ChatEvent_Join, stream pb.Chat_Broadcast
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	_, ok := s.clients[event.Join.Username]
+	username := event.Join.Username
+	log.Println("user", username, "is trying to join")
+
+	_, ok := s.clients[username]
 	if ok {
 		return ErrUsernameExists
 	}
-
-	username := event.Join.Username
 
 	if len(username) > 16 || strings.ToLower(username) == "server" {
 		return ErrInvalidUsername
@@ -71,7 +70,7 @@ func (s *ChatServer) userJoin(event *pb.ChatEvent_Join, stream pb.Chat_Broadcast
 	s.clients[username] = stream
 
 	if err := s.broadcast(&pb.ChatEvent_ChatMessage{
-		Username: "Server",
+		Username: ServerName,
 		Message:  fmt.Sprintf("Participant %s joined Chitty-Chat", username),
 	}); err != nil {
 		return err
@@ -85,6 +84,7 @@ func (s *ChatServer) userLeave(event *pb.ChatEvent_Leave) error {
 	defer s.mu.Unlock()
 
 	username := event.Leave.Username
+	log.Println("user", username, "is trying to leave")
 
 	_, ok := s.clients[username]
 	if !ok {
@@ -94,7 +94,7 @@ func (s *ChatServer) userLeave(event *pb.ChatEvent_Leave) error {
 	delete(s.clients, username)
 
 	if err := s.broadcast(&pb.ChatEvent_ChatMessage{
-		Username: "SERVER",
+		Username: ServerName,
 		Message:  fmt.Sprintf("Participant %s left Chitty-Chat", username),
 	}); err != nil {
 		return err
@@ -106,6 +106,9 @@ func (s *ChatServer) userLeave(event *pb.ChatEvent_Leave) error {
 func (s *ChatServer) chatMessage(event *pb.ChatEvent_Message) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+
+	username := event.Message.Username
+	log.Println("user", username, "is trying to send a message")
 
 	message := event.Message.Message
 
@@ -120,6 +123,9 @@ func (s *ChatServer) chatMessage(event *pb.ChatEvent_Message) error {
 
 func (s *ChatServer) broadcast(message *pb.ChatEvent_ChatMessage) error {
 	s.clock.Step()
+
+	username := message.Username
+	log.Println("broadcasting message from", username)
 
 	for _, stream := range s.clients {
 		if err := stream.Send(&pb.ChatMessage{
@@ -143,6 +149,10 @@ func (s *ChatServer) broadcast(message *pb.ChatEvent_ChatMessage) error {
 
 	return nil
 }
+
+const (
+	ServerName = "SERVER"
+)
 
 var (
 	ErrInvalidUsername  = errors.New("the username is invalid")
