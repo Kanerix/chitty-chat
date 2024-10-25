@@ -4,8 +4,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type TokenKey struct{}
-
 var Hostname string
 
 var RootCmd = &cobra.Command{
