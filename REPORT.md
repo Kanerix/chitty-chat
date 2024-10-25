@@ -67,7 +67,7 @@ message ChatEvent {
 }
 ```
 
-The RPC then turns the event into a message and streams it back to the client.
+The server then turns the event into a message and streams it back to the client.
 
 ```proto
 message ChatMessage {
