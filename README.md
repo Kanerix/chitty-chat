@@ -26,7 +26,7 @@ $ docker run chitty-chat-server
 
 ### Run server using Go CLI
 
-You can clone the repository and run it using the Go CLI.
+Clone the repository and run it using the Go CLI.
 
 ```bash
 git clone https://github.com/kanerix/chitty-chat
@@ -58,7 +58,7 @@ Install the `chitty` client from the github repository.
 go install github.com/kanerix/chitty-chat/cmd/chitty
 ```
 
-You can now use the CLI to connect to the server.
+Use the CLI to connect to the server.
 
 ```bash
 # chitty chat -u [username] -H [hostname]
@@ -67,20 +67,18 @@ chitty chat -u Kanerix -H localhost:8080
 
 ### Install client using Go CLI
 
-You can clone the repository and run it using the Go CLI.
+Clone the repository and run it using the Go CLI.
 
 ```bash
 git clone https://github.com/kanerix/chitty-chat
 ```
 
-Then run the CLI.
+Run the CLI with a username and optional hostname (default localhost:8080).
 
 ```bash
 # go run ./cmd/chitty -u [username] -H [hostname]
 go run ./cmd/chitty -u kanerix -H localhost:8080
 ```
-
-OPTIONAL: You can also use `make` to do the same.
 
 ### Get help using client
 
