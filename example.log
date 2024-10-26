@@ -1,10 +1,26 @@
-L[1] @ Bobby: Hello There!                                                                                                                    
-L[2] @ SERVER: Participant Johnny joined Chitty-Chat                                                                                          
-L[3] @ Johnny: Hello guys!                                                                                                                    
-L[4] @ Bobby: What's up?                                                                                                                      
-L[5] @ Johnny: Going to a wedding c'ya!                                                                                                       
-L[6] @ SERVER: Participant Johnny left Chitty-Chat                                                                                            
-L[7] @ Bobby: Where is my invite?                                                                                                             
-L[8] @ Bobby: Thats it, im going too!                                                                                                         
-L[9] @ Kanerix: Good luck                                                                                                                     
-L[10] @ SERVER: Participant Bobby left Chitty-Chat   
+<-- CLIENT LOGS -->
+L[1] @ Client started
+L[2] @ SERVER: Participant Johnny joined Chitty-Chat
+L[3] @ SERVER: Participant Kanerix joined Chitty-Chat
+L[4] @ SERVER: Participant Bobby joined Chitty-Chat
+L[5] @ Kanerix: Hello guys!
+L[6] @ Johnny: Hello my friend!
+L[7] @ Bobby: What's up?
+L[8] @ Kanerix: Not much, you?
+L[9] @ Bobby: Gonna go watch soccer. Goodbye!
+L[10] @ SERVER: Participant Bobby left Chitty-Chat
+L[11] @ Johnny: Well goodbye!
+
+
+<-- SERVER LOGS -->
+L[1] @ Server started
+L[2] @ Participant Johnny joined Chitty-Chat
+L[3] @ Participant Kanerix joined Chitty-Chat
+L[4] @ Participant Bobby joined Chitty-Chat
+L[5] @ Participant Kanerix is broadcasting a message to Chitty-Chat
+L[6] @ Participant Johnny is broadcasting a message to Chitty-Chat
+L[7] @ Participant Bobby is broadcasting a message to Chitty-Chat
+L[8] @ Participant Kanerix is broadcasting a message to Chitty-Chat
+L[9] @ Participant Bobby is broadcasting a message to Chitty-Chat
+L[10] @ Participant Bobby left Chitty-Chat
+L[11] @ Participant Johnny is broadcasting a message to Chitty-Chat
