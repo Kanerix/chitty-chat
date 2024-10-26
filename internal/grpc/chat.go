@@ -57,8 +57,10 @@ func (s *ChatServer) userJoin(event *pb.ChatEvent_Join, stream pb.Chat_Broadcast
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	s.clock.Step()
+
 	username := event.Join.Username
-	log.Println("user", username, "is trying to join")
+	log.Printf("L[%d] @ Participant %s joined Chitty-Chat", s.clock.Now(), username)
 
 	_, ok := s.clients[username]
 	if ok {
@@ -85,8 +87,10 @@ func (s *ChatServer) userLeave(event *pb.ChatEvent_Leave) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	s.clock.Step()
+
 	username := event.Leave.Username
-	log.Println("user", username, "is trying to leave")
+	log.Printf("L[%d] @ Participant %s left Chitty-Chat", s.clock.Now(), username)
 
 	_, ok := s.clients[username]
 	if !ok {
@@ -109,8 +113,10 @@ func (s *ChatServer) chatMessage(event *pb.ChatEvent_Message) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	s.clock.Step()
+
 	username := event.Message.Username
-	log.Println("user", username, "is trying to send a message")
+	log.Printf("L[%d] @ Participant %s is broadcasting a message to Chitty-Chat", s.clock.Now(), username)
 
 	message := event.Message.Message
 
@@ -124,11 +130,6 @@ func (s *ChatServer) chatMessage(event *pb.ChatEvent_Message) error {
 }
 
 func (s *ChatServer) broadcast(message *pb.ChatEvent_ChatMessage) error {
-	s.clock.Step()
-
-	username := message.Username
-	log.Println("broadcasting message from", username)
-
 	for _, stream := range s.clients {
 		if err := stream.Send(&pb.ChatMessage{
 			Timestamp: s.clock.Now(),
