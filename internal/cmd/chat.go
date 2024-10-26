@@ -33,9 +33,7 @@ var chatCmd = &cobra.Command{
 		}
 
 		p := tea.NewProgram(mvc.NewChatModel(stream, username), tea.WithAltScreen())
-
-		go mvc.MessageListener(stream, p)
-
+		go stream.MessageListener(p)
 		if _, err := p.Run(); err != nil {
 			return err
 		}

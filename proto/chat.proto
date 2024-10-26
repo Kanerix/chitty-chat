@@ -9,6 +9,8 @@ service Chat {
 }
 
 message ChatEvent {
+    uint64 timestamp = 1;
+
     oneof event {
         UserJoin join = 2;
         UserLeave leave = 3;

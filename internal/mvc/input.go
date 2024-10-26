@@ -31,3 +31,9 @@ func NewInputArea() InputArea {
 func (ia InputArea) Init() tea.Cmd {
 	return textarea.Blink
 }
+
+func (ia InputArea) Update(msg tea.Msg) (InputArea, tea.Cmd) {
+	area, cmd := ia.Model.Update(msg)
+	ia.Model = area
+	return ia, cmd
+}

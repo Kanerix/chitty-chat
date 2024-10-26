@@ -67,8 +67,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.input.Model, cmd = m.input.Model.Update(msg)
 		return m, cmd
 
-	case MessageRecvEvent:
-		m.chat.AppendMessage(&msg.Message)
+	case client.MessageRecvEvent:
+		m.chat.AppendMessage(&ChatMessage{
+			Timestamp: msg.Timestamp,
+			Username:  msg.Username,
+			Message:   msg.Message,
+		})
 		m.chat.RenderMessages()
 		return m, nil
 

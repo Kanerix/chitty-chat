@@ -15,3 +15,9 @@ func (c *Clock) Now() uint64 {
 func (c *Clock) Step() {
 	c.time.Add(1)
 }
+
+func (c *Clock) Max(other uint64) {
+	if c.time.Load() < other {
+		c.time.Swap(other)
+	}
+}

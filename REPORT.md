@@ -15,7 +15,7 @@ is made, such as receiving live updates, notifications, or real-time data feeds.
 
 The client sends a stream of data to the server with a single request, and the server responds once when
 all data is received. This is appropriate when the server needs to process or analyze a large stream of data
-sent by the client before responsding, such as file uploads or real-time data collection.
+sent by the client before responding, such as file uploads or real-time data collection.
 
 ### Bidirectional Streaming
 
@@ -30,7 +30,7 @@ Since this application is a chat server, bidirectional streaming is best for the
 ## 2. System architecture
 
 This project uses a client-server architecture for communication. The client connects to the chat server and messages
-is streamed between the server and the client. The clients are never directly exposed to eachother.
+is streamed between the server and the client. The clients are never directly exposed to each other.
 
 ## 3. RPC methods
 
@@ -79,11 +79,20 @@ message ChatMessage {
 
 ## 4. Lamport timestamps
 
-- [ ] Describe how you have implemented the calculation of the Lamport timestamps
+The Lamport timestamp is implemented using an atomic unsigned integer. We use an atomic integer because we need to
+make sure we don't run into race conditions if the clock is shared between multiple go routines which it will be.
+We use an unsigned integer since the clock will never be a negative number.
 
-## 5. Diagram of lamport
+The clock runs on both the servers and the clients.
 
-- [ ] Provide a diagram, that traces a sequence of RPC calls together with the Lamport timestamps, that corresponds to a chosen sequence of interactions: Client X joins, Client X Publishes, ..., Client X leaves. Include documentation (system logs) in your appendix.
+Every time we send a message we then increment the counter of the clock by one. When we receive a message, we compare
+the value of the timestamp in the message with the local clock and pick what ever value is the highest and again
+increment the clock by one.
+
+## 5. Diagram of Lamport
+
+- [ ] Provide a diagram, that traces a sequence of RPC calls together with the Lamport timestamps, that corresponds
+to a chosen sequence of interactions: Client X joins, Client X Publishes, ..., Client X leaves. Include documentation (system logs) in your appendix.
 
 ## 6. Github repository
 

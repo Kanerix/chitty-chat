@@ -2,14 +2,11 @@ package mvc
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/viewport"
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/kanerix/chitty-chat/internal/client"
 )
 
 type ChatView struct {
@@ -21,10 +18,6 @@ type ChatMessage struct {
 	Timestamp uint64
 	Username  string
 	Message   string
-}
-
-type MessageRecvEvent struct {
-	Message ChatMessage
 }
 
 var (
@@ -70,21 +63,4 @@ func (cm ChatMessage) String() string {
 	message := cm.Message
 
 	return timestampStyle.Render(timestamp) + " @ " + usernameStyle.Render(username) + ": " + message
-}
-
-func MessageListener(stream *client.BroadcastStream, p *tea.Program) error {
-	for {
-		req, err := stream.Recv()
-		if err != nil {
-			log.Fatal(err.Error())
-		}
-
-		p.Send(MessageRecvEvent{
-			Message: ChatMessage{
-				Timestamp: req.Timestamp,
-				Username:  req.Username,
-				Message:   req.Message,
-			},
-		})
-	}
 }

@@ -39,6 +39,8 @@ func (s *ChatServer) Broadcast(stream pb.Chat_BroadcastServer) error {
 }
 
 func (s *ChatServer) process(req *pb.ChatEvent, stream pb.Chat_BroadcastServer) error {
+	s.clock.Max(req.Timestamp)
+
 	switch evt := req.Event.(type) {
 	case *pb.ChatEvent_Join:
 		return s.userJoin(evt, stream)
