@@ -1,24 +1,84 @@
 # Chitty-Chat
 
-## gRPC usage
+## Usage Server
 
-Start of by logging in as an user. This will give you a token you can use to join the chat.
+This section will tell you how to start the Chitty-Chat server.
+
+### Go CLI
+
+Use the Go CLI to start the server.
 
 ```bash
-$ grpcurl -plaintext -format text -d 'username:"Bobby"' localhost:8080 chitty_chat.AuthService.Login
-session_token: "Bobby:false:9ca1c330-0a60-4776-962a-3670e62459ce"
+$ go run ./cmd/grpc
+2024/10/26 20:52:41 server is listening on [::]:8080
+...
 ```
 
-Then join the chat with your new session token.
+You can also use `make` to do the same.
 
 ```bash
-$ grpcurl -plaintext -d '@' -H 'authorization: <session_token>' localhost:8080 chitty_chat.ChatService.Chat
-"Bobby join the room"
+$ make grpc-serve
+2024/10/26 20:52:41 server is listening on [::]:8080
+...
 ```
 
-Then logout and make your username available for others.
+### Docker
+
+Build the Chitty-Chat server docker container.
 
 ```bash
-$ grpcurl -plaintext -format text -d 'session_token: <session_token>' localhost:8080 chitty_chat.AuthService.Logout
-"success"
+$ docker build . -t chitty-chat-server
+...
+[+] Building 10.0s (22/22) FINISHED
+...
+```
+
+Run the docker container.
+
+```bash
+$ docker run chitty-chat-server
+2024/10/26 20:52:41 server is listening on [::]:8080
+...
+```
+
+## Usage Client
+
+This section will tell you how to install and use the client.
+
+### Install from repo
+
+Install the `chitty` client from the github repository.
+
+```bash
+go install github.com/kanerix/chitty-chat/cmd/chitty
+```
+
+You can now use the CLI to connect to the server.
+
+```bash
+# chitty chat -u [username] -H [hostname]
+chitty chat -u Kanerix -H localhost:8080
+```
+
+### Run locally
+
+You can also clone the repository and run it from there.
+
+```bash
+git clone https://github.com/kanerix/chitty-chat
+```
+
+Then run the CLI.
+
+```bash
+# go run ./cmd/chitty -u [username] -H [hostname]
+go run ./cmd/chitty -u kanerix -H localhost:8080
+```
+
+### Help
+
+If you need any help, you can use the `--help` flag.
+
+```bash
+chitty chat -u [username]
 ```

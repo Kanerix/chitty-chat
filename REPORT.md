@@ -91,8 +91,7 @@ increment the clock by one.
 
 ## 5. Diagram of Lamport
 
-- [ ] Provide a diagram, that traces a sequence of RPC calls together with the Lamport timestamps, that corresponds
-to a chosen sequence of interactions: Client X joins, Client X Publishes, ..., Client X leaves. Include documentation (system logs) in your appendix.
+![Lamport diagram](Lamport.png "Lamport Diagram")
 
 ## 6. Github repository
 
