@@ -28,7 +28,7 @@ We call clients of the Chitty-Chat service Participants.
 
 ## Hand-in requirements
 
-- [ ] Hand in a single report in a pdf file
+- [x] Hand in a single report in a pdf file
 - [x] Discuss, whether you are going to use server-side streaming, client-side streaming, or bidirectional streaming?
 - [x] Describe your system architecture - do you have a server-client architecture, peer-to-peer, or something else?
 - [x] Describe what  RPC methods are implemented, of what type, and what messages types are used for communication
