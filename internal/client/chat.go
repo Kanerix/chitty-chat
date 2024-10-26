@@ -47,6 +47,7 @@ func (bs *BroadcastStream) JoinChat(username string) error {
 	bs.clock.Step()
 
 	if err := bs.Send(&pb.ChatEvent{
+		Timestamp: bs.clock.Now(),
 		Event: &pb.ChatEvent_Join{
 			Join: &pb.ChatEvent_UserJoin{
 				Username: username,
@@ -63,6 +64,7 @@ func (bs *BroadcastStream) LeaveChat(username string) error {
 	bs.clock.Step()
 
 	if err := bs.Send(&pb.ChatEvent{
+		Timestamp: bs.clock.Now(),
 		Event: &pb.ChatEvent_Leave{
 			Leave: &pb.ChatEvent_UserLeave{
 				Username: username,
