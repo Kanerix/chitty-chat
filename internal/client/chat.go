@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"log"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/kanerix/chitty-chat/internal/lamport"
@@ -99,7 +98,7 @@ func (bs *BroadcastStream) MessageListener(p *tea.Program) error {
 	for {
 		req, err := bs.Recv()
 		if err != nil {
-			log.Fatal(err.Error())
+			return err
 		}
 
 		p.Send(MessageRecvEvent{

@@ -19,8 +19,6 @@ var chatCmd = &cobra.Command{
 	Short:   "Join the chat on the Chitty-chat server",
 	Example: "chitty chat -H chitty.lerpz.com",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		log.SetFlags(0)
-
 		conn, err := grpc.NewClient(Hostname, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		if err != nil {
 			return err

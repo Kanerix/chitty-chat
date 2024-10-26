@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"log"
+	"os"
+
 	"github.com/spf13/cobra"
 )
 
@@ -10,6 +13,18 @@ var RootCmd = &cobra.Command{
 	Use:   "chitty",
 	Short: "The Chitty-Chat chat client!",
 	Args:  cobra.MinimumNArgs(1),
+	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		f, err := os.OpenFile("testlogfile", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+		if err != nil {
+			return err
+		}
+		defer f.Close()
+
+		log.SetFlags(0)
+		log.SetOutput(f)
+
+		return nil
+	},
 }
 
 func init() {
