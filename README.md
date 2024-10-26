@@ -1,28 +1,12 @@
 # Chitty-Chat
 
-## Usage Server
+Welcome to the Chitty-Chat project. This is developed following the course **Distributed Systems** at ITU.
+
+## Usage server
 
 This section will tell you how to start the Chitty-Chat server.
 
-### Go CLI
-
-Use the Go CLI to start the server.
-
-```bash
-$ go run ./cmd/grpc
-2024/10/26 20:52:41 server is listening on [::]:8080
-...
-```
-
-You can also use `make` to do the same.
-
-```bash
-$ make grpc-serve
-2024/10/26 20:52:41 server is listening on [::]:8080
-...
-```
-
-### Docker
+### Run server using Docker
 
 Build the Chitty-Chat server docker container.
 
@@ -41,11 +25,35 @@ $ docker run chitty-chat-server
 ...
 ```
 
-## Usage Client
+### Run server using Go CLI
+
+You can clone the repository and run it using the Go CLI.
+
+```bash
+git clone https://github.com/kanerix/chitty-chat
+```
+
+Use the Go CLI to start the server.
+
+```bash
+$ go run ./cmd/grpc
+2024/10/26 20:52:41 server is listening on [::]:8080
+...
+```
+
+OPTIONAL: You can also use `make` to do the same.
+
+```bash
+$ make grpc-serve
+2024/10/26 20:52:41 server is listening on [::]:8080
+...
+```
+
+## Usage client
 
 This section will tell you how to install and use the client.
 
-### Install from repo
+### Install client from repo
 
 Install the `chitty` client from the github repository.
 
@@ -60,9 +68,9 @@ You can now use the CLI to connect to the server.
 chitty chat -u Kanerix -H localhost:8080
 ```
 
-### Run locally
+### Install client using Go CLI
 
-You can also clone the repository and run it from there.
+You can clone the repository and run it using the Go CLI.
 
 ```bash
 git clone https://github.com/kanerix/chitty-chat
@@ -75,10 +83,12 @@ Then run the CLI.
 go run ./cmd/chitty -u kanerix -H localhost:8080
 ```
 
-### Help
+OPTIONAL: You can also use `make` to do the same.
+
+### Get help using client
 
 If you need any help, you can use the `--help` flag.
 
 ```bash
-chitty chat -u [username]
+chitty chat --help
 ```
