@@ -68,6 +68,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, cmd
 
 	case client.MessageRecvEvent:
+		m.notify.NotifyInfo(fmt.Sprintf("message from %s", msg.Username))
 		m.chat.AppendMessage(&ChatMessage{
 			Timestamp: msg.Timestamp,
 			Username:  msg.Username,
