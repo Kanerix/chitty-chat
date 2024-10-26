@@ -22,7 +22,6 @@ Run the docker container.
 ```bash
 $ docker run chitty-chat-server
 2024/10/26 20:52:41 server is listening on [::]:8080
-...
 ```
 
 ### Run server using Go CLI
@@ -38,7 +37,6 @@ Use the Go CLI to start the server.
 ```bash
 $ go run ./cmd/grpc
 2024/10/26 20:52:41 server is listening on [::]:8080
-...
 ```
 
 OPTIONAL: You can also use `make` to do the same.
@@ -46,7 +44,6 @@ OPTIONAL: You can also use `make` to do the same.
 ```bash
 $ make grpc-serve
 2024/10/26 20:52:41 server is listening on [::]:8080
-...
 ```
 
 ## Usage client
