@@ -16,17 +16,17 @@ RUN apk update && apk upgrade --no-cache && \
 RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
     go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
-ADD Makefile ./
-ADD proto ./proto
+COPY proto proto
 
-RUN make proto
+RUN --mount=type=bind,source=Makefile,target=Makefile \
+    make proto
 
 
-FROM chef AS builder
+FROM chef AS grpc-builder
 
 WORKDIR /build
 
-COPY --from=proto-builder /build/proto ./
+COPY --from=proto-builder /build/proto proto
 
 ADD . .
 
@@ -37,7 +37,7 @@ FROM alpine:3.20 AS runner
 
 WORKDIR /var/app
 
-COPY --from=builder /build/bin/grpc .
+COPY --from=grpc-builder /build/bin/grpc .
 
 RUN addgroup -S app && \
     adduser -S chitty -G app && \
