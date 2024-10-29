@@ -39,6 +39,8 @@ WORKDIR /var/app
 
 COPY --from=grpc-builder /build/bin/grpc .
 
+RUN mkdir logs
+
 RUN addgroup -S app && \
     adduser -S chitty -G app && \
     chown -R chitty:app /var/app
